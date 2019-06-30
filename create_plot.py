@@ -14,27 +14,11 @@ path_to_sensor_readings = "/home/pi/sensor_readings.txt"
 plot_format = ".png"
 
 
-def create_plot(date):
+def create_plot(date, df):
     # Generate dates for beginning and end of day
     date = date.replace(hour=23, minute=59, second=59, microsecond=0)
     date_zero = date.replace(hour=0, minute=0, second=0, microsecond=0)
 
-    # read log file
-    df = pd.read_csv(path_to_sensor_readings, sep="\t", header=None, names=["time", "temperature", "humidity"])
-    # clean up
-    df.replace(["None"], np.nan, inplace=True)
-    df = df.dropna()
-
-    # create index
-    df.index = pd.to_datetime(df["time"])
-    df = df.drop("time", 1)
-    # convert values from string to number
-    df["temperature"] = pd.to_numeric(df["temperature"])
-    df["humidity"] = pd.to_numeric(df["humidity"])
-
-    # remove humidity outliers
-    df = df[np.abs(df["humidity"]-df["humidity"].mean()) <= (3*df["humidity"].std())]
-    df = df.sort_index()
     # only take values from last 24h
     df = df.loc[date_zero:date]
 
@@ -86,13 +70,31 @@ def update_html():
     f.close()
     print("Updated index.html for " + str(figures) + " @ " + str(datetime.datetime.now()))
 
-def create_ten_plots(date):
+
+def create_ten_plots(date, df):
     for i in range(0, 8):
-        create_plot(date)
+        create_plot(date, df)
         date = date - pd.to_timedelta("1day")
 
 
 if __name__ == "__main__":
-    create_ten_plots(datetime.datetime.now())
+    # read log file
+    df = pd.read_csv(path_to_sensor_readings, sep="\t", header=None, names=["time", "temperature", "humidity"])
+    # clean up
+    df.replace(["None"], np.nan, inplace=True)
+    df = df.dropna()
+
+    # create index
+    df.index = pd.to_datetime(df["time"])
+    df = df.drop("time", 1)
+    # convert values from string to number
+    df["temperature"] = pd.to_numeric(df["temperature"])
+    df["humidity"] = pd.to_numeric(df["humidity"])
+
+    # remove humidity outliers
+    df = df[np.abs(df["humidity"]-df["humidity"].mean()) <= (3*df["humidity"].std())]
+    df = df.sort_index()
+
+    create_ten_plots(datetime.datetime.now(), df)
     # create_plot(datetime.datetime.now())
     update_html()
