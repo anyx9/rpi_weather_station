@@ -1,5 +1,9 @@
 import pandas as pd
 import numpy as np
+
+import matplotlib
+matplotlib.use('Agg')
+
 import matplotlib.pyplot as plt
 import datetime
 import os
@@ -8,6 +12,7 @@ from yattag import Doc
 #
 #   Create plots from weather data and generate html to display plots
 #
+
 
 path_to_figs = "/home/pi/figs/"
 path_to_sensor_readings = "/home/pi/sensor_readings.txt"
