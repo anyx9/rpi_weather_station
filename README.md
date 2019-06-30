@@ -1,6 +1,6 @@
 # create_plot.py
 
-Create plots from weather data and generate html to display plots
+Create plots from weather data and generate html to display plots.
 Start script every day @23:59.
 
 # main.py
